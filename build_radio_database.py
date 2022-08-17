@@ -22,7 +22,7 @@ HEADERS = {
     'content-type': 'application/json'}
 debug = True
 
-
+allowed_codecs = ['MP3', 'AAC+', 'AAC']
 async def async_build():
     """Show example on how to query the Radio Browser API."""
     async with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:

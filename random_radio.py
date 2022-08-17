@@ -24,7 +24,7 @@ HEADERS = {
     'content-type': 'application/json'}
 debug = True
 
-
+entities = [input_args.ent_url, input_args.ent_country, input_args.ent_name]
 def main() -> None:
     try:
         stations = pandas.read_pickle('./radiostore.pickle')
