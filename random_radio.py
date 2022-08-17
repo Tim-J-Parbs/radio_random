@@ -31,12 +31,12 @@ def main() -> None:
 
     try:
         thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
-        associated_stations = pandas.read_pickle('./countries/' + thisfile)
+        associated_stations = pandas.read_pickle(here + '/countries/' + thisfile)
     except:
         print('Database not found.')
         build_radio_database.build()
         thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
-        associated_stations = pandas.read_pickle('./countries/' + thisfile)
+        associated_stations = pandas.read_pickle(here+ '/countries/' + thisfile)
 
     this_radio = associated_stations.sample(n=1, weights="logpop").iloc[0]
     print("Chosen station {} and url {} from {}".format(this_radio['name'],this_radio['url'],this_radio['country']))
