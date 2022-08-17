@@ -30,9 +30,9 @@ async def async_build():
         df = pandas.DataFrame.from_records(station_dict)
         df['logpop'] = df['click_count'].apply(np.log)
         unique_countries = df['country'].unique().tolist()
-        for this_country in unique_countries:
-            associated_stations = df[df['country'] == this_country].copy()
-            print("Created station dataframe for {} with {} recorded stations!".format(this_country, len(associated_stations)))
+        for thiscountry in unique_countries:
+            associated_stations = df[df['country'] == thiscountry].copy()
+            print("Created station dataframe for {} with {} recorded stations!".format(thiscountry, len(associated_stations)))
             associated_stations.to_pickle(here + '/countries/' + re.sub('[^a-zA-Z0-9]', '', thiscountry) + '.pickle')
 
         return
