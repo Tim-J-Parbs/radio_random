@@ -1,4 +1,3 @@
-import numpy as np
 import random
 import pandas
 import requests
@@ -6,7 +5,7 @@ import sys
 import re
 import os
 import argparse
-import build_radio_database
+
 parser = argparse.ArgumentParser(description='Random radio stations!')
 
 parser.add_argument('--ent_url', help="Homeassistant entity for radio URL", type=str, default='input_text.radiourl')
@@ -34,6 +33,7 @@ def main() -> None:
         associated_stations = pandas.read_pickle(here + '/countries/' + thisfile)
     except:
         print('Database not found.')
+        import build_radio_database
         build_radio_database.build()
         thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
         associated_stations = pandas.read_pickle(here+ '/countries/' + thisfile)
