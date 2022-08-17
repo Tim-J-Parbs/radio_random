@@ -4,6 +4,7 @@ import pandas
 import requests
 import sys
 import re
+import os
 import argparse
 import build_radio_database
 parser = argparse.ArgumentParser(description='Random radio stations!')
@@ -25,17 +26,16 @@ HEADERS = {
 debug = True
 
 entities = [input_args.ent_url, input_args.ent_country, input_args.ent_name]
+
 def main() -> None:
+
+    thisfile = random.choice(os.listdir("./countries/"))  # change dir name to whatever
     try:
-        stations = pandas.read_pickle('./radiostore.pickle')
+        associated_stations = pandas.read_pickle('./countries/' + thisfile)
     except:
         print('Database not found.')
-        stations = build_radio_database.build()
-    unique_countries = stations['country'].unique().tolist()
-    todayscountry = random.choice(unique_countries)
-    associated_stations = stations[stations['country'] == todayscountry].copy()
-
-    associated_stations['logpop'] = associated_stations['click_count'].apply(np.log)
+        build_radio_database.build()
+        associated_stations = pandas.read_pickle('./countries/' + thisfile)
 
     this_radio = associated_stations.sample(n=1, weights="logpop").iloc[0]
     print("Chosen station {} and url {} from {}".format(this_radio['name'],this_radio['url'],this_radio['country']))
