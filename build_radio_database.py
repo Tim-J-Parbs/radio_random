@@ -12,7 +12,7 @@ if 'win32' in sys.platform:
 dontsend = True
 
 debug = True
-
+here = sys.path[0]
 allowed_codecs = ['MP3', 'AAC+', 'AAC']
 async def async_build():
     """Show example on how to query the Radio Browser API."""
@@ -33,7 +33,7 @@ async def async_build():
         for this_country in unique_countries:
             associated_stations = df[df['country'] == this_country].copy()
             print("Created station dataframe for {} with {} recorded stations!".format(this_country, len(associated_stations)))
-            df.to_pickle('./countries/' + this_country + '.pickle')
+            df.to_pickle(here + '/countries/' + this_country + '.pickle')
 
         return
 

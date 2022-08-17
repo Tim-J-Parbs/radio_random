@@ -26,10 +26,10 @@ HEADERS = {
 debug = True
 
 entities = [input_args.ent_url, input_args.ent_country, input_args.ent_name]
-
+here = sys.path[0]
 def main() -> None:
 
-    thisfile = random.choice(os.listdir("./countries/"))  # change dir name to whatever
+    thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
     try:
         associated_stations = pandas.read_pickle('./countries/' + thisfile)
     except:
