@@ -1,0 +1,64 @@
+import numpy as np
+import random
+import pandas
+import requests
+import sys
+import re
+import argparse
+import build_radio_database
+parser = argparse.ArgumentParser(description='Random radio stations!')
+
+parser.add_argument('--ent_url', help="Homeassistant entity for radio URL", type=str, default='input_text.radiourl')
+parser.add_argument('--ent_country', help="Homeassistant entity for radio URL", type=str, default='input_text.radiocountry')
+parser.add_argument('--ent_name', help="Homeassistant entity for radio URL", type=str, default='input_text.radioname')
+input_args = parser.parse_args()
+
+
+dontsend = True
+URL = 'http://localhost:8123'
+PASSWORD = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkZTMwNWI0YmVhNmM0N2Q4YjMxMzYyOTBmNTlhNDVhNyIsImlhdCI6MTY2MDYwNDI5OSwiZXhwIjoxOTc1OTY0Mjk5fQ.3mImhLhrzY42BN2iyJoq4JSabRpYWyfU2T7g70L7eyg'
+
+SET_STATE = '{}/api/states/{{}}'.format(URL)
+HEADERS = {
+    'Authorization': PASSWORD,
+    'content-type': 'application/json'}
+debug = True
+
+
+def main() -> None:
+    try:
+        stations = pandas.read_pickle('./radiostore.pickle')
+    except:
+        print('Database not found.')
+        stations = build_radio_database.build()
+    unique_countries = stations['country'].unique().tolist()
+    todayscountry = random.choice(unique_countries)
+    associated_stations = stations[stations['country'] == todayscountry].copy()
+
+    associated_stations['logpop'] = associated_stations['click_count'].apply(np.log)
+
+    this_radio = associated_stations.sample(n=1, weights="logpop").iloc[0]
+    print("Chosen station {} and url {} from {}".format(this_radio['name'],this_radio['url'],this_radio['country']))
+    newname = re.sub('[^a-zA-Z0-9 \n\.]', '', this_radio['name'])
+    data_bits = [ this_radio['url'], this_radio['country'], newname]
+    try:
+        for chunk, ent in zip(data_bits, entities):
+            data = '{{"state": "{}"}}'.format(chunk)
+            if debug:
+                print('posting ' + data + ' to ' + ent)
+            try:
+                if not dontsend:
+                    requests.post(SET_STATE.format(ent), data=data, headers=HEADERS)
+            except:
+                print(SET_STATE.format(ent))
+                print('Writing state ' + chunk + ' to HA entitiy ' + ent + ' failed')
+
+                sys.exit(4)
+    except:
+        print('Iterating over data failed.', file=sys.stderr)
+        sys.exit(3)
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
