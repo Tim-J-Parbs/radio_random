@@ -14,7 +14,7 @@ parser.add_argument('--ent_name', help="Homeassistant entity for radio URL", typ
 input_args = parser.parse_args()
 
 
-dontsend = True
+dontsend = False
 URL = 'http://localhost:8123'
 PASSWORD = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkZTMwNWI0YmVhNmM0N2Q4YjMxMzYyOTBmNTlhNDVhNyIsImlhdCI6MTY2MDYwNDI5OSwiZXhwIjoxOTc1OTY0Mjk5fQ.3mImhLhrzY42BN2iyJoq4JSabRpYWyfU2T7g70L7eyg'
 
