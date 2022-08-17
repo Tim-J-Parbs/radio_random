@@ -29,12 +29,13 @@ entities = [input_args.ent_url, input_args.ent_country, input_args.ent_name]
 here = sys.path[0]
 def main() -> None:
 
-    thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
     try:
+        thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
         associated_stations = pandas.read_pickle('./countries/' + thisfile)
     except:
         print('Database not found.')
         build_radio_database.build()
+        thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
         associated_stations = pandas.read_pickle('./countries/' + thisfile)
 
     this_radio = associated_stations.sample(n=1, weights="logpop").iloc[0]
