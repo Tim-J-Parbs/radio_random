@@ -1,9 +1,9 @@
-from radios import FilterBy, Order, RadioBrowser
+from radios import RadioBrowser
 import pandas
 import asyncio
 import sys
 import re
-import argparse
+
 import numpy as np
 if 'win32' in sys.platform:
     # Windows specific event-loop policy & cmd
@@ -13,7 +13,7 @@ dontsend = True
 
 debug = True
 here = sys.path[0]
-allowed_codecs = ['MP3', 'AAC+', 'AAC']
+allowed_codecs = ['MP3', 'AAC+', 'AAC', 'OGG']#, 'UNKOWN']
 async def async_build():
     """Show example on how to query the Radio Browser API."""
     async with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:
@@ -22,12 +22,18 @@ async def async_build():
 
         stations = await radios.stations()
         station_dict = [i.__dict__ for i in stations]
-        for i in range(len(station_dict)):
-            station_dict[i]['friendly_name'] = re.sub('[^a-zA-Z0-9 \n\.]', '', station_dict[i]['name'])
-            thiscountry = next((item.name for item in countries if item.code == station_dict[i]['country_code']), 'Unknown')
-            station_dict[i]['country'] = re.sub('[^a-zA-Z0-9 \n\.]', '', thiscountry)
+        for i in reversed(range(len(station_dict))):
+            stationcodecs = station_dict[i]['codec'].split(',')
+            if any(j in stationcodecs for j in allowed_codecs):
+                station_dict[i]['friendly_name'] = re.sub('[^a-zA-Z0-9 \n\.]', '', station_dict[i]['name'])
+                thiscountry = next((item.name for item in countries if item.code == station_dict[i]['country_code']), 'Unknown')
+                station_dict[i]['country'] = re.sub('[^a-zA-Z0-9 \n\.]', '', thiscountry)
+            else:
+                tmp = station_dict.pop(i)
+                print('Removed {} with codec(s) {}.'.format(tmp['name'], tmp['codec']))
 
         df = pandas.DataFrame.from_records(station_dict)
+        print('Got {} stations in here!'.format(len(df)))
         df['logpop'] = df['click_count'].apply(np.log)
         unique_countries = df['country'].unique().tolist()
         for thiscountry in unique_countries:
