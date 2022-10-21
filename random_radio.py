@@ -5,7 +5,7 @@ import sys
 import re
 import os
 import argparse
-
+from passwd_data import *
 parser = argparse.ArgumentParser(description='Random radio stations!')
 
 parser.add_argument('--ent_url', help="Homeassistant entity for radio URL", type=str, default='input_text.radiourl')
@@ -16,7 +16,7 @@ input_args = parser.parse_args()
 
 dontsend = False
 URL = 'http://localhost:8123'
-PASSWORD = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkZTMwNWI0YmVhNmM0N2Q4YjMxMzYyOTBmNTlhNDVhNyIsImlhdCI6MTY2MDYwNDI5OSwiZXhwIjoxOTc1OTY0Mjk5fQ.3mImhLhrzY42BN2iyJoq4JSabRpYWyfU2T7g70L7eyg'
+
 
 SET_STATE = '{}/api/states/{{}}'.format(URL)
 HEADERS = {
