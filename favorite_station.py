@@ -33,7 +33,8 @@ async def add_fave():
                 try:
                     print(station_dict[i]['friendly_name'])
                     print(station_dict[i]['country'])
-                except:
+                except Exception as e:
+                    print(e)
                     pass
             new_favorite = pd.DataFrame.from_records(station_dict)
 
