@@ -43,7 +43,8 @@ async def add_fave():
             for key, value in station_dict[i].items():
                 if isinstance(value, list):
                     station_dict[i][key] = tuple(value)
-                if db:
+            if db:
+                for key, value in station_dict[i].items():
                     print('Key: ' + key)
                     print('Value type: ' + str(type(value)))
                     try:
@@ -54,7 +55,7 @@ async def add_fave():
 
             new_favorite = pd.DataFrame.from_records(station_dict)
             try:
-                favorite_stations = pd.read_pickle(here  + "favorites.pickle")
+                favorite_stations = pd.read_pickle(here  + "/favorites.pickle")
                 print("Favorites found, opened database!")
             except Exception as e:
                 print(e)
