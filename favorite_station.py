@@ -53,7 +53,7 @@ async def add_fave():
                         print('Could not print value')
                     print('-----------------------')
 
-            new_favorite = pd.DataFrame.from_records(station_dict[i])
+            new_favorite = pd.DataFrame.from_dict(station_dict[i])
             try:
                 favorite_stations = pd.read_pickle(here  + "/favorites.pickle")
                 print("Favorites found, opened database!")
