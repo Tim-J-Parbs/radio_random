@@ -1,6 +1,6 @@
 import pandas as pd
 from radios import RadioBrowser
-import requests
+import asyncio
 import sys
 import re
 import os
@@ -15,10 +15,10 @@ if radiourl is None:
     print('No Radio url found :(')
 
 here = sys.path[0]
-def main() -> None:
-    with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:
+async def add_fave():
+    async with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:
         print('Building radio database from all over the world!')
-        stations = radios.stations()
+        stations = await radios.stations()
 
     station_dict = [i.__dict__ for i in stations]
     for i in reversed(range(len(station_dict))):
@@ -49,5 +49,6 @@ def main() -> None:
     print("Could not find radio url " + radiourl)
     sys.exit(4)
 
+
 if __name__ == "__main__":
-    main()
+    asyncio.run(add_fave())
