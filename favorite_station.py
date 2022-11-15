@@ -36,8 +36,16 @@ async def add_fave():
                 except Exception as e:
                     print(e)
                     pass
-            new_favorite = pd.DataFrame.from_records(station_dict)
 
+            for key, value in station_dict[i].items():
+                print('Key: ' + key)
+                print('Value type: ' + str(type(value)))
+                try:
+                    print(value)
+                except:
+                    print('Could not print value')
+                print('-----------------------')
+            new_favorite = pd.DataFrame.from_records(station_dict)
             try:
                 favorite_stations = pd.read_pickle(here  + "favorites.pickle")
                 print("Favorites found, opened database!")
