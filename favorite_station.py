@@ -9,16 +9,31 @@ from passwd_data import *
 parser = argparse.ArgumentParser(description='Favorite radio stations!')
 
 parser.add_argument('--radiourl', help="URL belonging to new favorite station", type=str, default=None)
+parser.add_argument('--remove', help="Remove the URL from the database?", type=str, default=0)
+
 parser.add_argument('--db', help="Debug", type=int, default=0)
 input_args = parser.parse_args()
 radiourl = input_args.radiourl
 db = input_args.db
+remove = input_args.remove
 
-if radiourl is None:
-    print('No Radio url found :(')
-    sys.exit(4)
+
 
 here = sys.path[0]
+
+def rm_fave():
+    try:
+        favorite_stations = pd.read_pickle(here + "/favorites.pickle")
+        print("Favorites found, opened database!")
+    except:
+        print("No favorites found, returning!")
+        return
+    favs = favorite_stations.drop(favorite_stations[favorite_stations['url'] == radiourl].index)
+    favs = favs.reset_index(drop=True)
+    favs.to_pickle(here + "/favorites.pickle")
+    print("Succesfully removed station!")
+    return
+
 async def add_fave():
     async with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:
         stations = await radios.stations()
@@ -67,6 +82,7 @@ async def add_fave():
             favs = pd.concat([new_favorite, favorite_stations])
             print("Concatenated databases.!")
             favs = favs.drop_duplicates(subset=['url'])
+            favs = favs.reset_index(drop=True)
             favs.to_pickle(here + "/favorites.pickle")
             return
     print("Could not find radio url " + radiourl)
@@ -74,4 +90,10 @@ async def add_fave():
 
 
 if __name__ == "__main__":
-    asyncio.run(add_fave())
+    if radiourl is None:
+        print('No Radio url found :(')
+        sys.exit(4)
+    if remove:
+        rm_fave()
+    else:
+        asyncio.run(add_fave())
