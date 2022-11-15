@@ -66,7 +66,7 @@ async def add_fave():
                 favorite_stations = new_favorite
             favs = pd.concat([new_favorite, favorite_stations])
             print("Concatenated databases.!")
-            favs = favs.drop_duplicates()
+            favs = favs.drop_duplicates(subset=['url'])
             favs.to_pickle(here + "/favorites.pickle")
             return
     print("Could not find radio url " + radiourl)
