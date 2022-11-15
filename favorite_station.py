@@ -22,6 +22,7 @@ here = sys.path[0]
 async def add_fave():
     async with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:
         stations = await radios.stations()
+        countries = await radios.countries()
 
     station_dict = [i.__dict__ for i in stations]
     for i in reversed(range(len(station_dict))):
@@ -30,7 +31,9 @@ async def add_fave():
             print("Found Radio Station!")
             try:
                 station_dict[i]['friendly_name'] = re.sub('[^a-zA-Z0-9 \n\.]', '', station_dict[i]['name'])
-                station_dict[i]['country'] = re.sub('[^a-zA-Z0-9 \n\.]', '', station_dict[i]['country'])
+                thiscountry = next((item.name for item in countries if item.code == station_dict[i]['country_code']),
+                                   'Unknown')
+                station_dict[i]['country'] = re.sub('[^a-zA-Z0-9 \n\.]', '', thiscountry)
             except:
                 print("Could not set friendly names: ")
                 try:
