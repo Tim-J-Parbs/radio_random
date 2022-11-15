@@ -43,7 +43,8 @@ async def add_fave():
                 favs = pd.concat([new_favorite, favorite_stations])
                 print("Concatenated databases.!")
                 favs.drop_duplicates()
-            except:
+            except Exception as e:
+                print(e)
                 print("No favorites found, building new database!")
                 favs = new_favorite
             favs.to_pickle(here + "favorites.pickle")
