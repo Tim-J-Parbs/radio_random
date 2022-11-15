@@ -13,11 +13,11 @@ input_args = parser.parse_args()
 radiourl = input_args.radiourl
 if radiourl is None:
     print('No Radio url found :(')
+    sys.exit(4)
 
 here = sys.path[0]
 async def add_fave():
     async with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:
-        print('Building radio database from all over the world!')
         stations = await radios.stations()
 
     station_dict = [i.__dict__ for i in stations]
@@ -32,14 +32,16 @@ async def add_fave():
                 print("Could not set friendly names: ")
                 try:
                     print(station_dict[i]['friendly_name'])
-                    print(station_dict[i]['friendly_name'])
+                    print(station_dict[i]['country'])
                 except:
                     pass
             new_favorite = pd.DataFrame.from_records(station_dict)
 
             try:
                 favorite_stations = pd.read_pickle(here  + "favorites.pickle")
+                print("Favorites found, opened database!")
                 favs = pd.concat([new_favorite, favorite_stations])
+                print("Concatenated databases.!")
                 favs.drop_duplicates()
             except:
                 print("No favorites found, building new database!")
