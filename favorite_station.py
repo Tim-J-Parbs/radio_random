@@ -9,28 +9,29 @@ from passwd_data import *
 parser = argparse.ArgumentParser(description='Favorite radio stations!')
 
 parser.add_argument('--radiourl', help="URL belonging to new favorite station", type=str, default=None)
-parser.add_argument('--remove', help="Remove the URL from the database?", type=str, default=0)
+parser.add_argument('--remove', help="Remove the URL from the database?", type=int, default=0)
+parser.add_argument('--database', help="Which dataset should be used? (def: 'favorites')", type=str, default="favorites")
 
 parser.add_argument('--db', help="Debug", type=int, default=0)
 input_args = parser.parse_args()
 radiourl = input_args.radiourl
 db = input_args.db
 remove = input_args.remove
-
+database = input_args.database
 
 
 here = sys.path[0]
 
 def rm_fave():
     try:
-        favorite_stations = pd.read_pickle(here + "/favorites.pickle")
-        print("Favorites found, opened database!")
+        favorite_stations = pd.read_pickle(here + "/" + database + ".pickle")
+        print("Stored list " + database + " found, opened database!")
     except:
-        print("No favorites found, returning!")
+        print("Stored list " + database + " not found!")
         return
     favs = favorite_stations.drop(favorite_stations[favorite_stations['url'] == radiourl].index)
     favs = favs.reset_index(drop=True)
-    favs.to_pickle(here + "/favorites.pickle")
+    favs.to_pickle(here + "/"  + database + ".pickle")
     print("Succesfully removed station!")
     return
 
@@ -73,17 +74,17 @@ async def add_fave():
 
             new_favorite = pd.DataFrame.from_dict(station_dict[i], 'index').T
             try:
-                favorite_stations = pd.read_pickle(here  + "/favorites.pickle")
-                print("Favorites found, opened database!")
+                favorite_stations = pd.read_pickle(here  + "/" + database + ".pickle")
+                print("Stored list " + database + " found, opened database!")
             except Exception as e:
                 print(e)
-                print("No favorites found, building new database!")
+                print("Stored list " + database + " not found, building new database.")
                 favorite_stations = new_favorite
             favs = pd.concat([new_favorite, favorite_stations])
             print("Concatenated databases.!")
             favs = favs.drop_duplicates(subset=['url'])
             favs = favs.reset_index(drop=True)
-            favs.to_pickle(here + "/favorites.pickle")
+            favs.to_pickle(here + "/" + database + ".pickle")
             return
     print("Could not find radio url " + radiourl)
     sys.exit(4)

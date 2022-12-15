@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='Random radio stations!')
 parser.add_argument('--ent_url', help="Homeassistant entity for radio URL", type=str, default='input_text.radiourl')
 parser.add_argument('--ent_country', help="Homeassistant entity for radio URL", type=str, default='input_text.radiocountry')
 parser.add_argument('--ent_name', help="Homeassistant entity for radio URL", type=str, default='input_text.radioname')
-parser.add_argument('--favorites', help="Pull from favorites? def:0",  default=False, type=lambda x: (str(x).lower() == 'true'))
+parser.add_argument('--favorites', help="Pull from favorites? def: False",  default=False, type=lambda x: (str(x).lower() == 'true'))
 input_args = parser.parse_args()
 
 
