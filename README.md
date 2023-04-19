@@ -12,6 +12,8 @@ Those point to `input_text` objects inside homeassistant. The URL can then be us
 
 Right now, the program uses pandas for its database, which I will change in the future to support a SQL database, which is probably much nicer. I could also allow more flexibility in choosing API options, or wrap the whole thing in a homeassistant integration.
 
+Requires `python3` above version 3.5, as well as the packages `radios` and `pandas`.
+
 The program comes in three parts: 
 # Build the database
 Because accessing the online database takes time (and bandwith), we build a local copy to a subfolder `./countries` using `pandas`. Takes around 17MB of space.
