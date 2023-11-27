@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description='Favorite radio stations!')
 
 parser.add_argument('--radiourl', help="URL belonging to  (new) favorite station", type=str, default=None)
 parser.add_argument('--database', help="Which dataset should be used? (def: 'favorites')", type=str, default="favorites")
+
 parser.add_argument('-r', '--remove', action='store_true', help="Remove the URL from the database")
 parser.add_argument('-l', '--list', action='store_true', help="List Database")
 parser.add_argument('-a', '--add', action='store_true',help="Add the URL to the database")
@@ -27,6 +28,9 @@ database = input_args.database
 
 
 checksum = sum([int(i) for i in [remove, add, list]])
+
+if db:
+    print(f"List: {list}, Add: {add}, Remove: {remove}")
 assert(checksum <= 1, "Conflicting options when calling radio_random")
 if checksum == 0:
     list = True
