@@ -120,12 +120,15 @@ async def add_fave():
 
 
 if __name__ == "__main__":
-    if radiourl is None:
-        print('No Radio url found :(')
-        sys.exit(4)
     if remove:
+        if radiourl is None:
+            print('No Radio url found :(')
+            sys.exit(4)
         rm_fave()
     elif add:
+        if radiourl is None:
+            print('No Radio url found :(')
+            sys.exit(4)
         asyncio.run(add_fave())
     else:
         list_fave()
