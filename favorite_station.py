@@ -20,17 +20,18 @@ parser.add_argument('--db', help="Debug", type=int, default=0)
 input_args = parser.parse_args()
 radiourl = input_args.radiourl
 db = input_args.db
-remove = input_args.remove
-list = input_args.list
-add = input_args.add
+command_remove = input_args.remove
+command_list = input_args.list
+command_add = input_args.add
 
 database = input_args.database
 
 
-checksum = sum([int(i) for i in [remove, add, list]])
+checksum = sum([int(i) for i in [command_remove, command_add, command_list]])
 
 if db:
-    print(f"List: {list}, Add: {add}, Remove: {remove}")
+    print(f"List: {command_list}, Add: {command_add}, Remove: {command_remove}")
+    print(checksum)
 assert(checksum <= 1, "Conflicting options when calling radio_random")
 if checksum == 0:
     list = True
@@ -124,12 +125,12 @@ async def add_fave():
 
 
 if __name__ == "__main__":
-    if remove:
+    if command_remove:
         if radiourl is None:
             print('No Radio url found :(')
             sys.exit(4)
         rm_fave()
-    elif add:
+    elif command_add:
         if radiourl is None:
             print('No Radio url found :(')
             sys.exit(4)
