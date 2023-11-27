@@ -6,6 +6,7 @@ import re
 import os
 import argparse
 from passwd_data import *
+import build_radio_database
 parser = argparse.ArgumentParser(description='Random radio stations!')
 
 parser.add_argument('--ent_url', help="Homeassistant entity for radio URL", type=str, default='input_text.radiourl')
@@ -16,12 +17,9 @@ parser.add_argument('--database', help="Which dataset should be used for favorit
 
 input_args = parser.parse_args()
 
+MACHINE_URL = 'http://localhost:8123'
 
-dontsend = False
-URL = 'http://localhost:8123'
-
-
-SET_STATE = '{}/api/states/{{}}'.format(URL)
+SET_STATE = '{}/api/states/{{}}'.format(MACHINE_URL)
 HEADERS = {
     'Authorization': PASSWORD,
     'content-type': 'application/json'}
@@ -37,7 +35,6 @@ def get_global_station(here):
         associated_stations = pandas.read_pickle(here + '/countries/' + thisfile)
     except:
         print('Database not found.')
-        import build_radio_database
         build_radio_database.build()
         thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
         associated_stations = pandas.read_pickle(here + '/countries/' + thisfile)
@@ -64,12 +61,9 @@ def main() -> None:
             if debug:
                 print('posting ' + data + ' to ' + ent)
             try:
-                if not dontsend:
-                    requests.post(SET_STATE.format(ent), data=data, headers=HEADERS)
+                requests.post(SET_STATE.format(ent), data=data, headers=HEADERS)
             except:
-                print(SET_STATE.format(ent))
                 print('Writing state ' + chunk + ' to HA entitiy ' + ent + ' failed')
-
                 sys.exit(4)
     except:
         print('Iterating over data failed.', file=sys.stderr)

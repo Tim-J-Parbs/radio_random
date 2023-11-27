@@ -36,7 +36,9 @@ def rm_fave():
     return
 
 async def add_fave():
-    async with RadioBrowser(user_agent="MyAwesomeApp/1.0.0") as radios:
+    # Not TOO happy with this, and a strong cause for a shift to SQL. While RadioBrowser can filter for URLs, this seems
+    # to be broken here
+    async with RadioBrowser(user_agent="random_radios/1.0.0") as radios:
         stations = await radios.stations()
         countries = await radios.countries()
 
