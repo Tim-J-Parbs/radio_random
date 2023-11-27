@@ -10,9 +10,9 @@ parser = argparse.ArgumentParser(description='Favorite radio stations!')
 
 parser.add_argument('--radiourl', help="URL belonging to  (new) favorite station", type=str, default=None)
 parser.add_argument('--database', help="Which dataset should be used? (def: 'favorites')", type=str, default="favorites")
-parser.add_argument('-r', '--remove', action='store_false', help="Remove the URL from the database")
-parser.add_argument('-l', '--list', action='store_false', help="List Database")
-parser.add_argument('-a', '--add', action='store_false',help="Add the URL to the database")
+parser.add_argument('-r', '--remove', action='store_true', help="Remove the URL from the database")
+parser.add_argument('-l', '--list', action='store_true', help="List Database")
+parser.add_argument('-a', '--add', action='store_true',help="Add the URL to the database")
 
 parser.add_argument('--db', help="Debug", type=int, default=0)
 
