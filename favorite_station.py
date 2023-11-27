@@ -8,16 +8,31 @@ import argparse
 from passwd_data import *
 parser = argparse.ArgumentParser(description='Favorite radio stations!')
 
-parser.add_argument('--radiourl', help="URL belonging to new favorite station", type=str, default=None)
-parser.add_argument('--remove', help="Remove the URL from the database?", type=int, default=0)
+parser.add_argument('--radiourl', help="URL belonging to  (new) favorite station", type=str, default=None)
 parser.add_argument('--database', help="Which dataset should be used? (def: 'favorites')", type=str, default="favorites")
+parser.add_argument('-r', '--remove', action='store_false', help="Remove the URL from the database")
+parser.add_argument('-l', '--list', action='store_false', help="List Database")
+parser.add_argument('-a', '--add', action='store_false',help="Add the URL to the database")
 
 parser.add_argument('--db', help="Debug", type=int, default=0)
+
 input_args = parser.parse_args()
 radiourl = input_args.radiourl
 db = input_args.db
 remove = input_args.remove
+list = input_args.list
+add = input_args.add
+
 database = input_args.database
+
+
+checksum = sum([int(i) for i in [remove, add, list]])
+assert(checksum <= 1, "Conflicting options when calling radio_random")
+if checksum == 0:
+    list = True
+
+
+
 
 
 here = sys.path[0]
@@ -34,6 +49,18 @@ def rm_fave():
     favs.to_pickle(here + "/"  + database + ".pickle")
     print("Succesfully removed station!")
     return
+
+def list_fave():
+    try:
+        favorite_stations = pd.read_pickle(here + "/" + database + ".pickle")
+        print("Stored list " + database + " found, opened database!")
+    except:
+        print("Stored list " + database + " not found!")
+        return
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(favorite_stations)
+    return
+
 
 async def add_fave():
     # Not TOO happy with this, and a strong cause for a shift to SQL. While RadioBrowser can filter for URLs, this seems
@@ -98,5 +125,7 @@ if __name__ == "__main__":
         sys.exit(4)
     if remove:
         rm_fave()
-    else:
+    elif add:
         asyncio.run(add_fave())
+    else:
+        list_fave()

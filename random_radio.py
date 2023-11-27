@@ -9,13 +9,16 @@ from passwd_data import *
 import build_radio_database
 parser = argparse.ArgumentParser(description='Random radio stations!')
 
+
 parser.add_argument('--ent_url', help="Homeassistant entity for radio URL", type=str, default='input_text.radiourl')
 parser.add_argument('--ent_country', help="Homeassistant entity for radio URL", type=str, default='input_text.radiocountry')
 parser.add_argument('--ent_name', help="Homeassistant entity for radio URL", type=str, default='input_text.radioname')
 parser.add_argument('--favorites', help="Pull from favorites? def: False",  default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument('--database', help="Which dataset should be used for favorites? (def: 'favorites')", type=str, default="favorites")
-
+parser.add_argument('--verbosity', help="Print output and information to console?def: False",  default=False, type=lambda x: (str(x).lower() == 'true'))
 input_args = parser.parse_args()
+
+
 
 MACHINE_URL = 'http://localhost:8123'
 
@@ -28,16 +31,22 @@ debug = True
 entities = [input_args.ent_url, input_args.ent_country, input_args.ent_name]
 getfavorites = input_args.favorites
 database = input_args.database
+verbosity = input_args.verbosity
+def vprint(msg):
+    if verbosity:
+        print(msg)
+
 here = sys.path[0]
 def get_global_station(here):
+    def get_random_country():
+        thisfile = random.choice(os.listdir(here + "/countries/"))
+        return pandas.read_pickle(here + '/countries/' + thisfile)
     try:
-        thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
-        associated_stations = pandas.read_pickle(here + '/countries/' + thisfile)
-    except:
+        associated_stations = get_random_country()
+    except: #Should only happen if the database has not been built
         print('Database not found.')
         build_radio_database.build()
-        thisfile = random.choice(os.listdir(here + "/countries/"))  # change dir name to whatever
-        associated_stations = pandas.read_pickle(here + '/countries/' + thisfile)
+        associated_stations = get_random_country()
     this_radio = associated_stations.sample(n=1, weights="logpop").iloc[0]
     return this_radio
 
