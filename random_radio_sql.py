@@ -40,7 +40,7 @@ cursor.execute('''
         fave_id INTEGER,
         FOREIGN KEY (radio_id) REFERENCES radiosites(id),
         FOREIGN KEY (fave_id) REFERENCES favorites(id),
-        PRIMARY KEY (website_id, category_id)
+        PRIMARY KEY (radio_id, fave_id)
     )
 ''')
 conn.commit()
