@@ -136,7 +136,8 @@ class bluetooth_connector():
                 elif command == 'disconnect':
                     disconnect_speaker(MAC)
 
-            except:
+            except Exception as A:
+                print(A)
                 print(f"Something gone wrong.")
 
 if __name__ == "__main__":
