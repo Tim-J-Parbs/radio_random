@@ -25,7 +25,7 @@ async def async_build():
     cursor.execute('''
         CREATE TABLE radiosites (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            friendly_name TEXT NOT NULL,
+            name TEXT NOT NULL,
             url TEXT NOT NULL,
             country TEXT,
             popularity BIGINT,
@@ -55,7 +55,7 @@ async def async_build():
                 url = station_dict[i]['url']
                 codec = station_dict[i]['codec']
                 cursor.execute('''
-                        INSERT INTO radiosites (friendly_name, url, country, popularity, codec)
+                        INSERT INTO radiosites (name, url, country, popularity, codec)
                         VALUES (?, ?, ?, ?, ?)
                     ''', (friendly_name, url, cleancountry, popularity, codec))
                 conn.commit()

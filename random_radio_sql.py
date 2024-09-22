@@ -77,7 +77,7 @@ def get_global_station():
         build_radio_sql_database.build()
         chosen_country = get_random_country()
 
-    cursor.execute('SELECT friendly_name, url, country, popularity FROM radiosites WHERE country=(?)', (chosen_country))
+    cursor.execute('SELECT name, url, country, popularity FROM radiosites WHERE country=(?)', (chosen_country))
     radios = cursor.fetchall()
 
     # Step 2: Calculate the total sum of click counts
