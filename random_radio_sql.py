@@ -105,7 +105,7 @@ def get_favorite_station(favorite_database):
     ''', (favorite_database,))
     favorite_radios = cursor.fetchall()
     print(favorite_radios)
-    if favorite_radios is None: return None
+    if favorite_radios is None or len(favorite_radios) == 0: return None
     this_radio = random.choice(favorite_radios)
     this_radio_dict = {'name': this_radio[0], 'url': this_radio[1], 'country': this_radio[2]}
     return this_radio_dict
