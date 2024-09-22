@@ -5,17 +5,9 @@ from passwd_data import *
 from bt_data import *
 import paho.mqtt.client as mqtt
 import sys
-import bluetooth
 import subprocess
+import re
 
-def get_device_name(mac_address):
-    name = bluetooth.lookup_name(mac_address, timeout=10)  # Timeout in seconds
-    if name:
-        print(f"Device {mac_address} is named: {name}")
-        return name
-    else:
-        print(f"Could not retrieve name for device {mac_address}")
-        return ''
 
 def run_bluetoothctl(commands):
     """
@@ -38,9 +30,10 @@ def run_bluetoothctl(commands):
             print(f"Error: {error}")
         else:
             print(output)
-
+        return output
     except subprocess.CalledProcessError as e:
         print(f"Error running bluetoothctl commands: {e}")
+    return ''
 
 def list_adapters():
     # List available Bluetooth adapters
@@ -69,7 +62,10 @@ def list_devices():
         f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
         f"paired-devices"  # Connect to the speaker
     ]
-    run_bluetoothctl(commands)
+    log = run_bluetoothctl(commands)
+    mac_address = re.findall(r'Device ([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5})', log)[0]
+    devices = [d[0] for d in BT_DEVICES if d[1] == mac_address]
+    return devices
 
 def disconnect_speaker(mac_address):
     print(f"Disconnecting from speaker at {mac_address}...")
@@ -138,7 +134,7 @@ class bluetooth_connector():
         except:
             print('Oh no :(')
     def check_connection(self):
-        devices = get_connected_devices()
+        devices = list_devices()
         if devices:
             dev_names = ','.join([d[1] for d in devices])
             self.client.publish(self.MQTT_DEVICE_TOPIC, dev_names)
@@ -155,7 +151,7 @@ class bluetooth_connector():
                     return
                 MAC = MAC[0]
                 if command == 'connect':
-                    connection_succesful = connect_by_mac(MAC)
+                    connect_by_mac(MAC)
                     print('OKE')
                     self.check_connection()
 
