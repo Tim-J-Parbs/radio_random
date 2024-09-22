@@ -18,13 +18,14 @@ def get_device_name(mac_address):
         return ''
 def connect_to_speaker(address):
     response=''
+    print('READY')
     p = pexpect.spawn('bluetoothctl', encoding='utf-8')
     p.logfile_read = sys.stdout
     p.expect('#')
     p.sendline("select "+PREFERRED_INTERFACE)
     p.expect("#")
     p.sendline("scan on")
-
+    print('SCANNING')
     mylist = ["Discovery started","Failed to start discovery","Device "+address+" not available","Failed to connect","Connection successful"]
     c = 0
     response = True
@@ -126,6 +127,7 @@ class bluetooth_connector():
                 MAC = MAC[0]
                 if command == 'connect':
                     connection_succesful = connect_to_speaker(MAC)
+                    print('OKE')
                     self.check_connection()
 
                 elif command == 'disconnect':
