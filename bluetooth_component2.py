@@ -28,8 +28,6 @@ def run_bluetoothctl(commands):
         output, error = process.communicate()
         if error:
             print(f"Error: {error}")
-        else:
-            print(output)
         return output
     except subprocess.CalledProcessError as e:
         print(f"Error running bluetoothctl commands: {e}")
@@ -60,7 +58,7 @@ def disconnect_by_mac(mac):
 def list_devices():
     commands = [
         f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
-        f"paired-devices"  # Connect to the speaker
+        f"info"  # Connect to the speaker
     ]
     log = run_bluetoothctl(commands)
     mac_address = re.findall(r'Device ([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5})', log)[0]
