@@ -136,7 +136,7 @@ class bluetooth_connector():
     def check_connection(self):
         devices = list_devices()
         if devices:
-            dev_names = ','.join([d[1] for d in devices])
+            dev_names = ','.join(devices)
             self.client.publish(self.MQTT_DEVICE_TOPIC, dev_names)
 
     def on_message(self, client, userdata, message):
