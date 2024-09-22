@@ -63,7 +63,7 @@ class radio_backend():
         # Connect to the MQTT broker
         self.client.connect(self.MQTT_BROKER, self.MQTT_PORT, 60)
         self.client.subscribe(self.MQTT_REQUEST_TOPIC)
-        self.client.loop_start()
+        self.client.loop_forever()
     def on_message(self, client, userdata, message):
         # Decode the incoming message
         payload = message.payload.decode("utf-8").split(',')
