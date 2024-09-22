@@ -4,6 +4,7 @@ import sys
 import re
 import os
 import numpy as np
+import tqdm
 import sqlite3 as sql
 if 'win32' in sys.platform:
     # Windows specific event-loop policy & cmd
@@ -44,7 +45,7 @@ async def async_build():
         stations = await radios.stations()
         # For each country, build a dictionary of stations, fix broken name strings and remove known bad codecs
         station_dict = [i.__dict__ for i in stations]
-        for i in reversed(range(len(station_dict))):
+        for i in tqdm(range(len(station_dict))):
             stationcodecs = station_dict[i]['codec'].split(',')
             if any(j in stationcodecs for j in allowed_codecs):
                 friendly_name = re.sub('[^a-zA-Z0-9 \n\.]', '', station_dict[i]['name'])
