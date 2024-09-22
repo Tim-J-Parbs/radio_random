@@ -24,7 +24,7 @@ def connect_to_speaker(mac_address):
     try:
         # Power on the Bluetooth controller
         subprocess.run(["bluetoothctl", "power", "on"], check=True)
-
+        subprocess.run(["bluetoothctl", "select", PREFERRED_INTERFACE], check=True)
         # Enable scanning
         subprocess.run(["bluetoothctl", "scan", "on"], check=True)
 

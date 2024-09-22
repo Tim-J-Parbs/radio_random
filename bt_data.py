@@ -1,3 +1,7 @@
 BT_DEVICES = []
 BT_DEVICES.append(('Device1', 'XX.XX.XX.XX'))
 BT_DEVICES.append(('Device2', 'AA.XX.XX.XX'))
+INTERFACES = []
+INTERFACES.append(('Device1', 'XX.XX.XX.XX'))
+INTERFACES.append(('Device2', 'AA.XX.XX.XX'))
+PREFERRED_INTERFACE = INTERFACES[0]
