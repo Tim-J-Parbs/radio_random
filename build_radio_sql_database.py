@@ -11,14 +11,16 @@ if 'win32' in sys.platform:
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 here = sys.path[0]
-dir_suffix = 'countries'
-folderpath = here + '/' + dir_suffix
 allowed_codecs = ['MP3', 'AAC+', 'AAC', 'OGG']#, 'UNKOWN']
 
 
 async def async_build():
+    debug = True
+    if debug: print('Connecting to database.')
     conn = sql.connect('radios.db')
     cursor = conn.cursor()
+    if debug: print('Connected.')
+
     cursor.execute('DROP TABLE IF EXISTS radiosites')
     cursor.execute('''
         CREATE TABLE radiosites (
@@ -31,19 +33,16 @@ async def async_build():
         )
     ''')
     conn.commit()
+    if debug: print('Created necessary table.')
     """Build a local copy of the RadioBrowser database"""
-    try:
-        if not os.path.exists(folderpath):
-            os.makedirs(folderpath)
-    except Exception as e:
-        print('Unable to access or write to ' + folderpath)
-        print('Please check write permission of current user to that folder')
-    assert(os.access(folderpath, os.W_OK), 'Unable to write to ' + folderpath + ', please check permissions')
 
+    assert(os.access(here, os.W_OK), 'Unable to write to ' + here + ', please check permissions')
+    if debug: print('Connecting to Radio database.')
     async with RadioBrowser(user_agent="random_radio/1.0.0") as radios:
         print('Building radio database from all over the world!')
         countries = await radios.countries()
         stations = await radios.stations()
+        if debug: print(f'Got {len(stations)} stations.')
         # For each country, build a dictionary of stations, fix broken name strings and remove known bad codecs
         station_dict = [i.__dict__ for i in stations]
         for i in tqdm(range(len(station_dict))):
