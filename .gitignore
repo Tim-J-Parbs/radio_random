@@ -1,6 +1,6 @@
 # program-specific
 passwd_data.py
-
+bt_data.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
