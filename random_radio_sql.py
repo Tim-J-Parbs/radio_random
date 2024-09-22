@@ -66,19 +66,26 @@ class radio_backend():
         self.client.loop_start()
     def on_message(self, client, userdata, message):
         # Decode the incoming message
-        payload = message.payload.decode("utf-8")
-        # Message is really simple - only the name of a favorites list or 'global' to sample from all available
-        # stations
+        payload = message.payload.decode("utf-8").split(',')
+        command = payload[0]
+        database = payload[1]
+        if command == 'request':
 
-        this_radio = get_global_station()
+            # Message is really simple - only the name of a favorites list or 'global' to sample from all available
+            # stations
 
-        print("Chosen station {} and url {} from {}".format(this_radio['name'], this_radio['url'], this_radio['country']))
-        newname = re.sub('[^a-zA-Z0-9 \n\.]', '', this_radio['name'])
+            this_radio = get_global_station()
 
-        self.client.publish(self.MQTT_NAME_TOPIC , newname)
-        self.client.publish(self.MQTT_URL_TOPIC,  this_radio['url'])
-        self.client.publish(self.MQTT_COUNTRY_TOPIC, this_radio['country'])
+            print("Chosen station {} and url {} from {}".format(this_radio['name'], this_radio['url'], this_radio['country']))
+            newname = re.sub('[^a-zA-Z0-9 \n\.]', '', this_radio['name'])
 
+            self.client.publish(self.MQTT_NAME_TOPIC , newname)
+            self.client.publish(self.MQTT_URL_TOPIC,  this_radio['url'])
+            self.client.publish(self.MQTT_COUNTRY_TOPIC, this_radio['country'])
+        elif command == 'add':
+            print('soon')
+        elif command == 'remove':
+            print('soon')
 def main() -> None:
     radio = radio_backend()
     return
