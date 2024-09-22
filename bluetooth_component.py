@@ -1,58 +1,78 @@
 import time
-import argparse
+import pexpect
 import numpy as np
 from passwd_data import *
 from bt_data import *
 import paho.mqtt.client as mqtt
-
-import bluetooth
+import sys
 import subprocess
+import re
 
-def get_device_name(mac_address):
-    name = bluetooth.lookup_name(mac_address, timeout=10)  # Timeout in seconds
-    if name:
-        print(f"Device {mac_address} is named: {name}")
-        return name
-    else:
-        print(f"Could not retrieve name for device {mac_address}")
-        return ''
 
-def connect_to_speaker(mac_address):
-    print(f"Connecting to speaker at {mac_address}...")
-
-    # Using `bluetoothctl` to connect to the speaker
+def run_bluetoothctl(commands):
+    """
+    Run a series of commands in a single bluetoothctl interactive session.
+    The commands argument should be a list of strings.
+    """
     try:
-        # Power on the Bluetooth controller
-        subprocess.run(["bluetoothctl", "power", "on"], check=True)
-        subprocess.run(["bluetoothctl", "select", PREFERRED_INTERFACE[1]], check=True)
-        # Enable scanning
-        subprocess.run(["bluetoothctl", "scan", "on"], check=True)
+        # Start bluetoothctl process
+        process = subprocess.Popen(['bluetoothctl'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-        # Trust the device
-        subprocess.run(["bluetoothctl", "trust", mac_address], check=True)
+        # Send the series of commands to the interactive session
+        for command in commands:
+            process.stdin.write(command + '\n')
+            process.stdin.flush()
 
-        # Pair with the device
-        subprocess.run(["bluetoothctl", "pair", mac_address], check=True)
-
-        # Connect to the device
-        subprocess.run(["bluetoothctl", "connect", mac_address], check=True)
-
-        print("Connection successful.")
-        return True
+        # Read the output (optional, to see results in real time)
+        output, error = process.communicate()
+        if error:
+            print(f"Error: {error}")
+        return output
     except subprocess.CalledProcessError as e:
-        print(f"Error connecting to speaker: {e}")
-        return False
+        print(f"Error running bluetoothctl commands: {e}")
+    return ''
+
+def list_adapters():
+    # List available Bluetooth adapters
+    result = subprocess.run(["bluetoothctl", "list"], capture_output=True, text=True)
+    adapters = result.stdout.splitlines()
+    return adapters
+
+def connect_by_mac(mac):
+    commands = [
+        f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
+        f"trust {mac}",  # Trust the speaker
+        f"pair {mac}",  # Pair with the speaker
+        f"connect {mac}"  # Connect to the speaker
+    ]
+    run_bluetoothctl(commands)
+
+def disconnect_by_mac(mac):
+    commands = [
+        f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
+        f"disconnect {mac}"  # Connect to the speaker
+    ]
+    run_bluetoothctl(commands)
+
+def list_devices():
+    commands = [
+        f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
+        f"info"  # Connect to the speaker
+    ]
+    log = run_bluetoothctl(commands)
+    mac_address = re.findall(r'Device ([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5})', log)
+    if len(mac_address) == 0:
+        return ''
+    devices = [d[0] for d in BT_DEVICES if d[1] == mac_address[0]]
+    return devices
 
 def disconnect_speaker(mac_address):
-    print(f"Connecting to speaker at {mac_address}...")
+    print(f"Disconnecting from speaker at {mac_address}...")
 
     # Using `bluetoothctl` to connect to the speaker
     try:
-        # Power on the Bluetooth controller
-        subprocess.run(["bluetoothctl", "power", "on"], check=True)
-
         # Connect to the device
-        subprocess.run(["bluetoothctl", "disconnect", mac_address], check=True)
+        subprocess.run(["bluetoothctl", "disconnect", mac_address])
 
         print("Disconnection successful.")
         return True
@@ -62,12 +82,14 @@ def disconnect_speaker(mac_address):
 
 def get_connected_devices():
     try:
+        print(f"GETTING BT DEVICES")
         # Get a list of all devices using bluetoothctl
         result = subprocess.run(["bluetoothctl", "paired-devices"], capture_output=True, text=True)
         devices = result.stdout.splitlines()
 
         connected_devices = []
-
+        print(f"DEVICES:")
+        print(devices)
         # Iterate over each device
         for device in devices:
             parts = device.split(" ")
@@ -76,6 +98,7 @@ def get_connected_devices():
                 device_name = " ".join(parts[2:])
 
                 # Check if the device is connected
+                print(f"Checking {device}")
                 info_result = subprocess.run(["bluetoothctl", "info", mac_address], capture_output=True, text=True)
                 if "Connected: yes" in info_result.stdout:
                     connected_devices.append((mac_address, device_name))
@@ -110,9 +133,9 @@ class bluetooth_connector():
         except:
             print('Oh no :(')
     def check_connection(self):
-        devices = get_connected_devices()
+        devices = list_devices()
         if devices:
-            dev_names = ','.join([d[1] for d in devices])
+            dev_names = ','.join(devices)
             self.client.publish(self.MQTT_DEVICE_TOPIC, dev_names)
 
     def on_message(self, client, userdata, message):
@@ -127,13 +150,15 @@ class bluetooth_connector():
                     return
                 MAC = MAC[0]
                 if command == 'connect':
-                    connection_succesful = connect_to_speaker(MAC)
+                    connect_by_mac(MAC)
+                    print('OKE')
                     self.check_connection()
 
                 elif command == 'disconnect':
-                    disconnect_speaker(MAC)
+                    disconnect_by_mac(MAC)
 
-            except:
+            except Exception as A:
+                print(A)
                 print(f"Something gone wrong.")
 
 if __name__ == "__main__":
