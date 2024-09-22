@@ -131,65 +131,76 @@ class radio_backend():
         payload = message.payload.decode("utf-8").split(',')
         command = payload[0]
         database = payload[1]
-        if command == 'request':
+        try:
+            if command == 'request':
 
-            # Message is really simple - only the name of a favorites list or 'global' to sample from all available
-            # stations
-            this_radio = None
-            if database != 'global':
-                this_radio = get_favorite_station(database)
+                # Message is really simple - only the name of a favorites list or 'global' to sample from all available
+                # stations
+                this_radio = None
+                if database != 'global':
+                    this_radio = get_favorite_station(database)
 
-            if database == 'global' or this_radio is None:
-                this_radio = get_global_station()
+                if database == 'global' or this_radio is None:
+                    this_radio = get_global_station()
 
-            print("Chosen station {} and url {} from {}".format(this_radio['name'], this_radio['url'], this_radio['country']))
-            newname = re.sub('[^a-zA-Z0-9 ]', '', this_radio['name'])
+                print("Chosen station {} and url {} from {}".format(this_radio['name'], this_radio['url'], this_radio['country']))
+                newname = re.sub('[^a-zA-Z0-9 ]', '', this_radio['name'])
 
-            self.client.publish(self.MQTT_NAME_TOPIC , newname)
-            self.client.publish(self.MQTT_URL_TOPIC,  this_radio['url'])
-            self.client.publish(self.MQTT_COUNTRY_TOPIC, this_radio['country'])
-        elif command == 'add':
-            # TODO: ERROR HANDLING
+                self.client.publish(self.MQTT_NAME_TOPIC , newname)
+                self.client.publish(self.MQTT_URL_TOPIC,  this_radio['url'])
+                self.client.publish(self.MQTT_COUNTRY_TOPIC, this_radio['country'])
+            elif command == 'add':
+                # TODO: ERROR HANDLING
 
-            url = payload[2]
-            if self.debug: print(f"Adding {url} to {database}")
-            cursor.execute('SELECT id FROM favorites WHERE name = ?', (database,))
-            result = cursor.fetchone()
-            if result is None:
-                print(f'Creating category {database}...')
+                url = payload[2]
+                if self.debug: print(f"Adding {url} to {database}")
+                cursor.execute('SELECT id FROM favorites WHERE name = ?', (database,))
+                result = cursor.fetchone()
+                if result is None:
+                    print(f'Creating category {database}...')
+                    cursor.execute('''
+                                INSERT INTO favorites (name)
+                                VALUES (?)
+                            ''', (database,))
+
+                radio_id = get_radio_id(url)
+                fave_id = get_favorites_id(database)
+                # Check if the association already exists
                 cursor.execute('''
-                            INSERT INTO favorites (name)
-                            VALUES (?)
-                        ''', (database,))
+                       SELECT 1 FROM radio_favorites WHERE radio_id = ? AND fave_id = ?
+                   ''', (radio_id, fave_id))
+                if cursor.fetchone():
+                    print(f"{url} already in {database}.")
+                else:
+                    cursor.execute('''
+                        INSERT OR IGNORE INTO radio_favorites (radio_id, fave_id)
+                        VALUES (?, ?)
+                    ''', (radio_id, fave_id))
+                    conn.commit()
 
-            radio_id = get_radio_id(url)
-            fave_id = get_favorites_id(database)
-            cursor.execute('''
-                INSERT INTO radio_favorites (radio_id, fave_id)
-                VALUES (?, ?)
-            ''', (radio_id, fave_id))
-            conn.commit()
+            elif command == 'remove':
+                # Get the radio ID
+                url = payload[2]
+                radio_id = get_radio_id(url)
+                if radio_id is None: return
 
-        elif command == 'remove':
-            # Get the radio ID
-            url = payload[2]
-            radio_id = get_radio_id(url)
-            if radio_id is None: return
-
-            # Get the category ID
-            fave_id = get_favorites_id(database)
-            if fave_id is None: return
+                # Get the category ID
+                fave_id = get_favorites_id(database)
+                if fave_id is None: return
 
 
-            # Delete the association from the website_categories table
-            cursor.execute('''
-                    DELETE FROM radio_favorites
-                    WHERE radio_id = ? AND fave_id = ?
-                ''', (radio_id, fave_id))
+                # Delete the association from the website_categories table
+                cursor.execute('''
+                        DELETE FROM radio_favorites
+                        WHERE radio_id = ? AND fave_id = ?
+                    ''', (radio_id, fave_id))
 
-            # Commit the change
-            conn.commit()
-            print(f"Association between radio '{url}' and category '{database}' has been removed.")
+                # Commit the change
+                conn.commit()
+                print(f"Association between radio '{url}' and category '{database}' has been removed.")
+        except:
+            print(f"Something gone wrong.")
+
 def main() -> None:
     radio = radio_backend()
     return
