@@ -24,8 +24,8 @@ def connect_to_speaker(address):
     p.logfile_read = sys.stdout
     p.expect('#')
     print('GOT IT')
-    p.sendline("select "+PREFERRED_INTERFACE)
-    print(f"SELECTED {PREFERRED_INTERFACE}")
+    p.sendline("select "+PREFERRED_INTERFACE[1])
+    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
     p.expect("#")
     p.sendline("scan on")
     print('SCANNING')
