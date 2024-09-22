@@ -46,10 +46,25 @@ def connect_to_speaker(address):
     p.close()
     #time.sleep(1)
     return response
-
+def disconnect_from_speaker(address):
+    response=''
+    print('READY')
+    p = pexpect.spawn('bluetoothctl', encoding='utf-8')
+    print('SPAWNED')
+    p.logfile_read = sys.stdout
+    p.expect('#')
+    print('GOT IT')
+    p.sendline("select "+PREFERRED_INTERFACE[1])
+    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
+    p.expect("#")
+    p.sendline("disconnect " + address)
+    p.sendline("quit")
+    p.close()
+    #time.sleep(1)
+    return response
 
 def disconnect_speaker(mac_address):
-    print(f"Connecting to speaker at {mac_address}...")
+    print(f"Disconnecting from speaker at {mac_address}...")
 
     # Using `bluetoothctl` to connect to the speaker
     try:
