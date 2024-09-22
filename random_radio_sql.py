@@ -100,7 +100,7 @@ def get_favorite_station(favorite_database):
         SELECT r.name, r.url, r.country
         FROM radiosites r
         JOIN radio_favorites rf ON r.id = rf.radio_id
-        JOIN favorites f ON rf.category_id = f.id
+        JOIN favorites f ON rf.fave_id = f.id
         WHERE f.name = ?
     ''', (favorite_database,))
     favorite_radios = cursor.fetchall()
