@@ -20,7 +20,6 @@ def run_bluetoothctl(commands):
 
         # Send the series of commands to the interactive session
         for command in commands:
-            print(f"Running: {command}")
             process.stdin.write(command + '\n')
             process.stdin.flush()
 
