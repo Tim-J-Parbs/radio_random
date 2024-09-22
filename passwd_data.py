@@ -1,1 +1,3 @@
 PASSWORD = 'Bearer ...'
+MQTT_IP = '127.0.0.1'
+MQTT_PORT = 1883
