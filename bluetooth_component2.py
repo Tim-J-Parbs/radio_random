@@ -149,7 +149,7 @@ class bluetooth_connector():
                     self.check_connection()
 
                 elif command == 'disconnect':
-                    disconnect_speaker(MAC)
+                    disconnect_from_speaker(MAC)
 
             except Exception as A:
                 print(A)
