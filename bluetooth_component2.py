@@ -20,9 +20,12 @@ def connect_to_speaker(address):
     response=''
     print('READY')
     p = pexpect.spawn('bluetoothctl', encoding='utf-8')
+    print('SPAWNED')
     p.logfile_read = sys.stdout
     p.expect('#')
+    print('GOT IT')
     p.sendline("select "+PREFERRED_INTERFACE)
+    print(f"SELECTED {PREFERRED_INTERFACE}")
     p.expect("#")
     p.sendline("scan on")
     print('SCANNING')
