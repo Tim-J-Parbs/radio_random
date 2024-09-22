@@ -16,53 +16,60 @@ def get_device_name(mac_address):
     else:
         print(f"Could not retrieve name for device {mac_address}")
         return ''
-def connect_to_speaker(address):
-    response=''
-    print('READY')
-    p = pexpect.spawn('bluetoothctl', encoding='utf-8')
-    print('SPAWNED')
-    p.logfile_read = sys.stdout
-    p.expect('#')
-    print('GOT IT')
-    p.sendline("select "+PREFERRED_INTERFACE[1])
-    p.expect("#")
-    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
 
-    p.sendline("scan on")
-    print('SCANNING')
-    mylist = ["Discovery started","Failed to start discovery","Device "+address+" not available","Failed to connect","Connection successful"]
-    c = 0
-    response = True
-    while response != "Connection successful":
-        p.expect(mylist)
-        response=p.after
-        p.sendline("connect "+address)
-        time.sleep(1)
-        c += 1
-        if c > 10:
-            print('Device unavailable')
-            response = False
-            break
-    p.sendline("quit")
-    p.close()
-    #time.sleep(1)
-    return response
-def disconnect_from_speaker(address):
-    response=''
-    print('READY')
-    p = pexpect.spawn('bluetoothctl', encoding='utf-8')
-    print('SPAWNED')
-    p.logfile_read = sys.stdout
-    p.expect('#')
-    print('GOT IT')
-    p.sendline("select "+PREFERRED_INTERFACE[1])
-    p.expect("#")
-    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
-    p.sendline("disconnect " + address)
-    p.sendline("quit")
-    p.close()
-    #time.sleep(1)
-    return response
+def run_bluetoothctl(commands):
+    """
+    Run a series of commands in a single bluetoothctl interactive session.
+    The commands argument should be a list of strings.
+    """
+    try:
+        # Start bluetoothctl process
+        process = subprocess.Popen(['bluetoothctl'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        # Send the series of commands to the interactive session
+        for command in commands:
+            print(f"Running: {command}")
+            process.stdin.write(command + '\n')
+            process.stdin.flush()
+
+        # Read the output (optional, to see results in real time)
+        output, error = process.communicate()
+        if error:
+            print(f"Error: {error}")
+        else:
+            print(output)
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error running bluetoothctl commands: {e}")
+
+def list_adapters():
+    # List available Bluetooth adapters
+    result = subprocess.run(["bluetoothctl", "list"], capture_output=True, text=True)
+    adapters = result.stdout.splitlines()
+    return adapters
+
+def connect_by_mac(mac):
+    commands = [
+        f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
+        f"trust {mac}",  # Trust the speaker
+        f"pair {mac}",  # Pair with the speaker
+        f"connect {mac}"  # Connect to the speaker
+    ]
+    run_bluetoothctl(commands)
+
+def disconnect_by_mac(mac):
+    commands = [
+        f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
+        f"disconnect {mac}"  # Connect to the speaker
+    ]
+    run_bluetoothctl(commands)
+
+def list_devices():
+    commands = [
+        f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
+        f"paired-devices"  # Connect to the speaker
+    ]
+    run_bluetoothctl(commands)
 
 def disconnect_speaker(mac_address):
     print(f"Disconnecting from speaker at {mac_address}...")
@@ -148,12 +155,12 @@ class bluetooth_connector():
                     return
                 MAC = MAC[0]
                 if command == 'connect':
-                    connection_succesful = connect_to_speaker(MAC)
+                    connection_succesful = connect_by_mac(MAC)
                     print('OKE')
                     self.check_connection()
 
                 elif command == 'disconnect':
-                    disconnect_from_speaker(MAC)
+                    disconnect_by_mac(MAC)
 
             except Exception as A:
                 print(A)
