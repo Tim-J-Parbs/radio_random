@@ -69,7 +69,7 @@ def disconnect_speaker(mac_address):
     # Using `bluetoothctl` to connect to the speaker
     try:
         # Connect to the device
-        subprocess.run(["bluetoothctl", "disconnect", mac_address], check=True)
+        subprocess.run(["bluetoothctl", "disconnect", mac_address])
 
         print("Disconnection successful.")
         return True
