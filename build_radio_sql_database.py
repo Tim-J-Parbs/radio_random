@@ -4,7 +4,7 @@ import sys
 import re
 import os
 import numpy as np
-import tqdm
+from tqdm import tqdm
 import sqlite3 as sql
 if 'win32' in sys.platform:
     # Windows specific event-loop policy & cmd
