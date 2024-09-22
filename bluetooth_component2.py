@@ -25,8 +25,9 @@ def connect_to_speaker(address):
     p.expect('#')
     print('GOT IT')
     p.sendline("select "+PREFERRED_INTERFACE[1])
-    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
     p.expect("#")
+    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
+
     p.sendline("scan on")
     print('SCANNING')
     mylist = ["Discovery started","Failed to start discovery","Device "+address+" not available","Failed to connect","Connection successful"]
@@ -55,8 +56,8 @@ def disconnect_from_speaker(address):
     p.expect('#')
     print('GOT IT')
     p.sendline("select "+PREFERRED_INTERFACE[1])
-    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
     p.expect("#")
+    print(f"SELECTED {PREFERRED_INTERFACE[1]}")
     p.sendline("disconnect " + address)
     p.sendline("quit")
     p.close()
@@ -79,12 +80,14 @@ def disconnect_speaker(mac_address):
 
 def get_connected_devices():
     try:
+        print(f"GETTING BT DEVICES")
         # Get a list of all devices using bluetoothctl
         result = subprocess.run(["bluetoothctl", "paired-devices"], capture_output=True, text=True)
         devices = result.stdout.splitlines()
 
         connected_devices = []
-
+        print(f"DEVICES:")
+        print(devices)
         # Iterate over each device
         for device in devices:
             parts = device.split(" ")
@@ -93,6 +96,7 @@ def get_connected_devices():
                 device_name = " ".join(parts[2:])
 
                 # Check if the device is connected
+                print(f"Checking {device}")
                 info_result = subprocess.run(["bluetoothctl", "info", mac_address], capture_output=True, text=True)
                 if "Connected: yes" in info_result.stdout:
                     connected_devices.append((mac_address, device_name))
