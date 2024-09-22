@@ -62,6 +62,8 @@ def list_devices():
     ]
     log = run_bluetoothctl(commands)
     mac_address = re.findall(r'Device ([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5})', log)[0]
+    if len(mac_address) == 0:
+        return ''
     devices = [d[0] for d in BT_DEVICES if d[1] == mac_address]
     return devices
 
