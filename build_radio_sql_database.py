@@ -14,22 +14,23 @@ here = sys.path[0]
 dir_suffix = 'countries'
 folderpath = here + '/' + dir_suffix
 allowed_codecs = ['MP3', 'AAC+', 'AAC', 'OGG']#, 'UNKOWN']
-conn = sql.connect('radios.db')
-cursor = conn.cursor()
-cursor.execute('DROP TABLE IF EXISTS radiosites')
-cursor.execute('''
-    CREATE TABLE radiosites (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        friendly_name TEXT NOT NULL,
-        url TEXT NOT NULL,
-        country TEXT,
-        popularity BIGINT,
-        codec TEXT
-    )
-''')
-conn.commit()
+
 
 async def async_build():
+    conn = sql.connect('radios.db')
+    cursor = conn.cursor()
+    cursor.execute('DROP TABLE IF EXISTS radiosites')
+    cursor.execute('''
+        CREATE TABLE radiosites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            friendly_name TEXT NOT NULL,
+            url TEXT NOT NULL,
+            country TEXT,
+            popularity BIGINT,
+            codec TEXT
+        )
+    ''')
+    conn.commit()
     """Build a local copy of the RadioBrowser database"""
     try:
         if not os.path.exists(folderpath):
@@ -74,6 +75,7 @@ async def async_build():
         return
 
 def build():
+
     asyncio.run(async_build())
     return
 
