@@ -1,5 +1,4 @@
 from radios import RadioBrowser
-import pandas
 import asyncio
 import sys
 import re
@@ -58,6 +57,7 @@ async def async_build():
                         INSERT INTO radiosites (friendly_name, url, country, popularity, codec)
                         VALUES (?, ?, ?, ?, ?)
                     ''', (friendly_name, url, cleancountry, popularity, codec))
+                conn.commit()
             else:
                 print('Removed {} with codec(s) {}.'.format( station_dict[i]['name'], station_dict[i]['codec']))
 
@@ -69,7 +69,7 @@ async def async_build():
         cursor.execute('SELECT DISTINCT country FROM radiosites')
         unique_countries = cursor.fetchall()
         print(f'Got {unique_websites_count} stations from {len(unique_countries)} in here!')
-
+        conn.close()
         return
 
 def build():
