@@ -77,7 +77,7 @@ class radio_backend():
             this_radio = get_global_station()
 
             print("Chosen station {} and url {} from {}".format(this_radio['name'], this_radio['url'], this_radio['country']))
-            newname = re.sub('[^a-zA-Z0-9 \n\.]', '', this_radio['name'])
+            newname = re.sub('[^a-zA-Z0-9 ]', '', this_radio['name'])
 
             self.client.publish(self.MQTT_NAME_TOPIC , newname)
             self.client.publish(self.MQTT_URL_TOPIC,  this_radio['url'])

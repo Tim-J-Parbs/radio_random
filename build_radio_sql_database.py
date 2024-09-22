@@ -48,9 +48,9 @@ async def async_build():
         for i in tqdm(range(len(station_dict))):
             stationcodecs = station_dict[i]['codec'].split(',')
             if any(j in stationcodecs for j in allowed_codecs):
-                friendly_name = re.sub('[^a-zA-Z0-9 \n\.]', '', station_dict[i]['name'])
+                friendly_name = re.sub('[^a-zA-Z0-9 ]', '', station_dict[i]['name'])
                 thiscountry = next((item.name for item in countries if item.code == station_dict[i]['country_code']), 'Unknown')
-                cleancountry = re.sub('[^a-zA-Z0-9 \n\.]', '', thiscountry)
+                cleancountry = re.sub('[^a-zA-Z0-9 ]', '', thiscountry)
                 popularity = station_dict[i]['click_count']
                 url = station_dict[i]['url']
                 codec = station_dict[i]['codec']
