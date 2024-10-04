@@ -151,11 +151,13 @@ class bluetooth_connector():
                 MAC = MAC[0]
                 if command == 'connect':
                     connect_by_mac(MAC)
-                    print('OKE')
+                    print(f"Connected to {bt_device} at {MAC}")
                     self.check_connection()
 
                 elif command == 'disconnect':
                     disconnect_by_mac(MAC)
+                    print(f"Disconnected from {bt_device} at {MAC}")
+                    self.check_connection()
 
             except Exception as A:
                 print(A)
