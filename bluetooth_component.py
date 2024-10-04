@@ -136,6 +136,8 @@ class bluetooth_connector():
         devices = list_devices()
         if devices:
             dev_names = ','.join(devices)
+            if len(dev_names) == 0:
+                dev_names = 'Unknown'
             self.client.publish(self.MQTT_DEVICE_TOPIC, dev_names)
 
     def on_message(self, client, userdata, message):
