@@ -140,7 +140,7 @@ class bluetooth_connector():
 
     def on_message(self, client, userdata, message):
             # Decode the incoming message
-            payload = message.payload.decode("utf-8").split(',')
+            payload = message.payload.decode("utf-8").strip().split(',')
             command = payload[0]
             bt_device = payload[1]
             try:

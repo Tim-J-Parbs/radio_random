@@ -128,7 +128,7 @@ class radio_backend():
 
     def on_message(self, client, userdata, message):
         # Decode the incoming message
-        payload = message.payload.decode("utf-8").split(',')
+        payload = message.payload.decode("utf-8").strip().split(',')
         command = payload[0]
         database = payload[1]
         try:
