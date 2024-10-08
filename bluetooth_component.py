@@ -117,8 +117,9 @@ class bluetooth_connector():
         self.MQTT_PORT = MQTT_PORT
         self.MQTT_REQUEST_TOPIC = "home-assistant/bluetooth/bt_request"
         self.MQTT_DEVICE_TOPIC = "home-assistant/bluetooth/bt_device"
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        self.client = mqtt.Client(client_id='BluetoothControl')
         self.client.on_message = self.on_message
+        self.client.on_disconnect = self.on_disconnect()
         # Connect to the MQTT broker
         self.client.connect(self.MQTT_BROKER, self.MQTT_PORT, 60)
         self.client.subscribe(self.MQTT_REQUEST_TOPIC)
@@ -164,6 +165,7 @@ class bluetooth_connector():
             except Exception as A:
                 print(A)
                 print(f"Something gone wrong.")
-
+    def on_disconnect(self):
+        print('Is kill.')
 if __name__ == "__main__":
     bluetooth_connector()
