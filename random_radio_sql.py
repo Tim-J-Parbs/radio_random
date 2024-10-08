@@ -118,7 +118,7 @@ class radio_backend():
         self.MQTT_URL_TOPIC = "home-assistant/radio/radio_url"
         self.MQTT_NAME_TOPIC = "home-assistant/radio/radio_name"
         self.MQTT_COUNTRY_TOPIC = "home-assistant/radio/radio_country"
-        self.client = mqtt.Client(client_id='RadioControl')
+        self.client = mqtt.Client(client_id='RadioControl', protocol=mqtt.MQTTv5)
         self.client.on_message = self.on_message
         # Connect to the MQTT broker
         self.client.connect(self.MQTT_BROKER, self.MQTT_PORT, 60)
