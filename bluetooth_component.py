@@ -117,7 +117,7 @@ class bluetooth_connector():
         self.MQTT_PORT = MQTT_PORT
         self.MQTT_REQUEST_TOPIC = "home-assistant/bluetooth/bt_request"
         self.MQTT_DEVICE_TOPIC = "home-assistant/bluetooth/bt_device"
-        self.client = mqtt.Client(client_id='BluetoothControl',protocol=mqtt.MQTTv5)
+        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id='BluetoothControl',protocol=mqtt.MQTTv5)
         self.client.on_message = self.on_message
         self.client.on_disconnect = self.on_disconnect()
         # Connect to the MQTT broker
