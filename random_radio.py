@@ -21,7 +21,7 @@ input_args = parser.parse_args()
 
 
 MACHINE_URL = 'http://localhost:8123'
-
+a=1
 SET_STATE = '{}/api/states/{{}}'.format(MACHINE_URL)
 HEADERS = {
     'Authorization': PASSWORD,

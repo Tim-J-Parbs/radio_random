@@ -32,7 +32,7 @@ checksum = sum([int(i) for i in [command_remove, command_add, command_list]])
 if db:
     print(f"List: {command_list}, Add: {command_add}, Remove: {command_remove}")
     print(checksum)
-assert(checksum <= 1, "Conflicting options when calling radio_random")
+assert checksum <= 1, "Conflicting options when calling radio_random"
 if checksum == 0:
     list = True
 
