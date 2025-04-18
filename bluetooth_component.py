@@ -44,7 +44,7 @@ def connect_by_mac(mac):
         f"pair {mac}",  # Pair with the speaker
         f"connect {mac}"  # Connect to the speaker
     ]
-    run_bluetoothctl(commands)
+    print(run_bluetoothctl(commands))
 
 def disconnect_by_mac(mac):
     commands = [
@@ -54,15 +54,22 @@ def disconnect_by_mac(mac):
     run_bluetoothctl(commands)
 
 def list_devices():
-    commands = [
-        f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
-        f"info"  # Connect to the speaker
-    ]
-    log = run_bluetoothctl(commands)
-    mac_address = re.findall(r'Device ([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5})', log)
-    if len(mac_address) == 0:
-        return ''
-    devices = [d[0] for d in BT_DEVICES if d[1] == mac_address[0]]
+    devices =[]
+    for dev in BT_DEVICES:
+        commands = [
+            f"select {PREFERRED_INTERFACE[1]}",  # Select the adapter
+            f"info {dev[1]}"  # Connect to the speaker
+        ]
+        log = run_bluetoothctl(commands)
+        match = re.search(r'Connected: (yes|no)$', log, re.MULTILINE)
+        if match:
+            is_connected = match.group(1) == 'yes'
+            if is_connected:
+                devices.append(dev[0])
+        #mac_address = re.findall(r'Device ([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5})', log)
+        #if len(mac_address) == 0:
+            #return ''
+        #devices = [d[0] for d in BT_DEVICES if d[1] == mac_address[0]]
     return devices
 
 def disconnect_speaker(mac_address):
