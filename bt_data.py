@@ -1,7 +1,0 @@
-BT_DEVICES = []
-BT_DEVICES.append(('creatived100', "00:02:3C:44:92:58"))
-BT_DEVICES.append(('strdh590', '50:5B:C2:43:C7:99'))
-INTERFACES = []
-INTERFACES.append(('internal',"E8:FB:1C:65:98:74"))
-INTERFACES.append(('stick',"00:1A:7D:DA:71:15"))
-PREFERRED_INTERFACE = INTERFACES[0]
